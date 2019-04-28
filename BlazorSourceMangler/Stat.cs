@@ -10,7 +10,6 @@ namespace BlazorSourceMangler
         internal static string methodName = string.Empty;
         internal static int counter = 0;
 
-
         internal static void DoStat(MethodBase md)
         {
             if (methodName != md.Name)
