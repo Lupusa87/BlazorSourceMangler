@@ -1,6 +1,6 @@
 # Blazor Source Mangler
 
-This is .core console app which is processing blazor dlls (only blazor app and blazor lib dlls, not common dlls like mscorelib) and is mangling propery/field/parameter/method/type/namespace names.
+This is .core console app which is processing blazor dlls (only blazor app and blazor lib dlls, not common dlls like mscorelib) and is mangling property/field/parameter/method/type/namespace names.
 
 Purpose is to make downloaded balzor dlls less readable for foreign eyes.
 
