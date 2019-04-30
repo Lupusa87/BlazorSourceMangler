@@ -71,10 +71,9 @@ namespace BlazorSourceMangler
             RenameFieldNames();
 
 
-            //!!! can't be used for now because builder has hard coded prop names and manling is giving error!!!
-            // builder shoul dinstead use properties for example not "abc" but someclass.abc
+            //!!! can't be used for now because builder has hard coded prop names and mangling is giving error!!!
+            // builder should instead use properties for example not "a" but someclass.a
             // RenamePropertyNames();
-
 
             RenameMethodNames();
             RenameTypeNames();
