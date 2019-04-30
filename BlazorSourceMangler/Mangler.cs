@@ -21,6 +21,9 @@ namespace BlazorSourceMangler
         bool verboseDeep;
         bool manglePublic;
 
+
+        bool IsBlazorAppDll = false;
+
         DefaultAssemblyResolver resolver = new DefaultAssemblyResolver();
 
 
@@ -30,7 +33,7 @@ namespace BlazorSourceMangler
         };
 
 
-        internal Mangler(FileInfo _inputFile, FileInfo _outputFile,bool _manglePublic, bool _verbose, bool _verboseDeep)
+        internal Mangler(FileInfo _inputFile, FileInfo _outputFile,bool _manglePublic, bool _verbose, bool _verboseDeep, bool _IsBlazorAppDll)
         {
 
             resolver.AddSearchDirectory(_outputFile.DirectoryName);
@@ -41,6 +44,7 @@ namespace BlazorSourceMangler
             manglePublic = _manglePublic;
             verbose = _verbose;
             verboseDeep = _verboseDeep;
+            IsBlazorAppDll = _IsBlazorAppDll;
         }
 
 
@@ -56,6 +60,11 @@ namespace BlazorSourceMangler
 
             //Under Construction
             //RemoveDeadMethods(md);
+
+            if (IsBlazorAppDll)
+            {
+                RenameNamespaceNames();
+            }
 
             RenameEnumNames();
             RenameParameters();
@@ -343,6 +352,35 @@ namespace BlazorSourceMangler
             }
         }
 
+
+        private void RenameNamespaceNames()
+        {
+            Stat.Reset();
+
+            IEnumerable<TypeDefinition> types = md.GetTypes().Where(x => !string.IsNullOrEmpty(x.Namespace)).Where(x=>x.Namespace.Contains(".") && !x.Namespace.Contains("Shared"));
+
+            List<string> nss = types.Select(x => x.Namespace).Distinct().ToList();
+
+            foreach (var item in types)
+            {
+                if (verboseDeep)
+                {
+                    Console.WriteLine("=====namespace " + item.Namespace);
+                }
+
+                item.Namespace = "N" + Helper.GetCode(nss.IndexOf(item.Namespace), MethodBase.GetCurrentMethod());
+
+                if (verboseDeep)
+                {
+                    Console.WriteLine("    =====new value " + item.Namespace);
+                }
+            }
+
+            if (verbose)
+            {
+                Console.WriteLine("renamed namespaces count = " + nss.Count, MethodBase.GetCurrentMethod());
+            }
+        }
 
         private void RenameEnumNames()
         {

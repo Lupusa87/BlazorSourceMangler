@@ -21,6 +21,9 @@ namespace BlazorSourceMangler
             bool verboseDeep = false;
             bool manglePublic = false;
 
+            string BlazorAppDllName = "blazortodos.dll";
+            
+
             if (outputDir.Exists)
             {
                 outputDir.GetFiles().ToList().ForEach(f => f.Delete());
@@ -35,11 +38,12 @@ namespace BlazorSourceMangler
 
             foreach (var item in files.OrderBy(x=>x.Length))
             {
+
                 Mangler m = new Mangler(item,
                     new FileInfo(Path.Combine(outputDir.FullName, item.Name)),
                     manglePublic,
                     verbose,
-                    verboseDeep);
+                    verboseDeep, item.Name.Equals(BlazorAppDllName, StringComparison.InvariantCultureIgnoreCase));
 
                 m.ProcessFile();
             }
