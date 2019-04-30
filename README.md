@@ -8,4 +8,9 @@ Also shortening names is giving some small dll's size reducion.
 
 App is using mono.cecil.
 
+
+Check this [youtube video](https://www.youtube.com/watch?v=nlXax81b1UE) for more details.
+
+Check this [blazor todos app](https://lupblazortodo.z20.web.core.windows.net) to see result of this app (downloaded blazortodos.dll is mangled and decompilation shows uglyfied code).
+
 Any PRs are welcome.
