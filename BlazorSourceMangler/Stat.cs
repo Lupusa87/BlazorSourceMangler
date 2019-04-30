@@ -12,16 +12,24 @@ namespace BlazorSourceMangler
 
         internal static void DoStat(MethodBase md)
         {
-            if (methodName != md.Name)
-            {
-                methodName = md.Name;
-                counter = 1;
-            }
-            else
+            if (methodName.Equals(md.Name, StringComparison.InvariantCultureIgnoreCase))
             {
                 counter++;
             }
+            else
+            {
+                methodName = md.Name;
+                counter = 1;
+                
+            }
         }
 
-    }
+
+        internal static void Reset()
+        {
+            methodName = string.Empty;
+            counter = 0;
+            Console.WriteLine();
+        }
+  }
 }

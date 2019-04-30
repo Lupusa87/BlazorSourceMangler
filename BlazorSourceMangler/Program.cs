@@ -18,7 +18,8 @@ namespace BlazorSourceMangler
             DirectoryInfo inputDir = new DirectoryInfo("E:/monocecil/_bin");
             DirectoryInfo outputDir = new DirectoryInfo("E:/monocecil/_bin2");
             bool verbose = true;
-            bool manglePublic = true;
+            bool verboseDeep = false;
+            bool manglePublic = false;
 
             if (outputDir.Exists)
             {
@@ -34,7 +35,11 @@ namespace BlazorSourceMangler
 
             foreach (var item in files.OrderBy(x=>x.Length))
             {
-                Mangler m = new Mangler(item, new FileInfo(Path.Combine(outputDir.FullName, item.Name)), manglePublic, verbose);
+                Mangler m = new Mangler(item,
+                    new FileInfo(Path.Combine(outputDir.FullName, item.Name)),
+                    manglePublic,
+                    verbose,
+                    verboseDeep);
 
                 m.ProcessFile();
             }

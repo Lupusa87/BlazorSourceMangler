@@ -18,6 +18,7 @@ namespace BlazorSourceMangler
         ModuleDefinition md;
 
         bool verbose;
+        bool verboseDeep;
         bool manglePublic;
 
         DefaultAssemblyResolver resolver = new DefaultAssemblyResolver();
@@ -29,7 +30,7 @@ namespace BlazorSourceMangler
         };
 
 
-        internal Mangler(FileInfo _inputFile, FileInfo _outputFile,bool _manglePublic, bool _verbose)
+        internal Mangler(FileInfo _inputFile, FileInfo _outputFile,bool _manglePublic, bool _verbose, bool _verboseDeep)
         {
 
             resolver.AddSearchDirectory(_outputFile.DirectoryName);
@@ -39,6 +40,7 @@ namespace BlazorSourceMangler
             outputFile = _outputFile;
             manglePublic = _manglePublic;
             verbose = _verbose;
+            verboseDeep = _verboseDeep;
         }
 
 
@@ -76,6 +78,7 @@ namespace BlazorSourceMangler
         {
             if (verbose)
             {
+                Console.WriteLine();
                 Console.WriteLine("======saving file========");
                 Console.WriteLine(outputFile.FullName);
             }
@@ -84,20 +87,32 @@ namespace BlazorSourceMangler
 
         private void RenameParameters()
         {
-
+            Stat.Reset();
             int counter = 0;
 
-            var toInspect = md.GetTypes()
+            var toInspect = md.GetTypes().Where(x=>!x.Name.Contains("<"))
                   .SelectMany(t => t.Methods.Select(m => new { t, m }))
-                  .Where(x => x.m.HasParameters);
+                  .Where(x => x.m.HasParameters && !x.m.Name.Contains("<") && !x.m.Name.StartsWith("set_"));
 
 
             foreach (var item in toInspect)
             {
+                //Console.WriteLine(item.m.Name);
                 foreach (var i in item.m.Parameters)
                 {
                     counter++;
-                    i.Name = Helper.GetCode(counter, MethodBase.GetCurrentMethod());  
+
+                    if (verboseDeep)
+                    {
+                        Console.WriteLine("=====parameter " + i.Name + ", method " + item.m.Name + ", type " + item.t.Name);
+                    }
+
+                    i.Name = Helper.GetCode(counter, MethodBase.GetCurrentMethod());
+
+                    if (verboseDeep)
+                    {
+                        Console.WriteLine("    =====new value " + i.Name);
+                    }
                 }
 
                 counter = 0;
@@ -113,21 +128,23 @@ namespace BlazorSourceMangler
 
         private void RenameMethodNames()
         {
+            Stat.Reset();
+
             int counter = 0;
 
             IEnumerable<MethodDefinition> methods;
 
-            foreach (var t in md.GetTypes().Where(x => !ShouldIgnoreClases.Any(y => y.Equals(x.Name.ToLower()))))
+            foreach (var t in md.GetTypes().Where(x => !x.Name.Contains("<") && !ShouldIgnoreClases.Any(y => y.Equals(x.Name.ToLower()))))
             {
 
 
                 if (manglePublic)
                 {
-                    methods = t.Methods.Where(x => !x.IsConstructor && !x.IsRuntimeSpecialName);
+                    methods = t.Methods.Where(x => !x.IsConstructor && !x.IsRuntimeSpecialName && !x.Name.Contains("<") && !x.Name.Contains("get_") && !x.Name.Contains("set_"));
                 }
                 else
                 {
-                    methods = t.Methods.Where(x => x.IsPublic == false && !x.IsConstructor && !x.IsRuntimeSpecialName);
+                    methods = t.Methods.Where(x => x.IsPublic == false && !x.IsConstructor && !x.IsRuntimeSpecialName && !x.Name.Contains("<") && !x.Name.Contains("get_") && !x.Name.Contains("set_"));
                 }
 
                 foreach (var i in methods)
@@ -140,8 +157,12 @@ namespace BlazorSourceMangler
                     }
 
 
-                    counter++;
+                    if (verboseDeep)
+                    {
+                        Console.WriteLine("=====method " + i.Name + ", type " + t.Name);
+                    }
 
+                    counter++;
                     if (i.Name.Contains("."))
                     {
                         i.Name = i.Name.Substring(0, i.Name.LastIndexOf(".") + 1) + "M" + Helper.GetCode(counter, MethodBase.GetCurrentMethod());
@@ -150,6 +171,13 @@ namespace BlazorSourceMangler
                     {
                         i.Name = "M" + Helper.GetCode(counter, MethodBase.GetCurrentMethod());
                     }
+
+                    if (verboseDeep)
+                    {
+                        Console.WriteLine("    =====new value " + i.Name);
+                    }
+
+                    
                 }
 
                 counter = 0;
@@ -163,6 +191,8 @@ namespace BlazorSourceMangler
 
         private void RenameFieldNames()
         {
+            Stat.Reset();
+
             int counter = 0;
 
             IEnumerable<FieldDefinition> fields;
@@ -182,10 +212,20 @@ namespace BlazorSourceMangler
 
                 foreach (var i in fields)
                 {
-                    
+                    if (verboseDeep)
+                    {
+                        Console.WriteLine("=====field " + i.Name + ", type " + t.Name);
+                    }
+
                     counter++;
 
                     i.Name = "F" + Helper.GetCode(counter, MethodBase.GetCurrentMethod());
+
+                    if (verboseDeep)
+                    {
+                        Console.WriteLine("    =====new value " + i.Name);
+                    }
+                    
 
                 }
 
@@ -201,6 +241,7 @@ namespace BlazorSourceMangler
 
         private void RenamePropertyNames()
         {
+            Stat.Reset();
             int counter = 0;
 
 
@@ -235,10 +276,20 @@ namespace BlazorSourceMangler
                     }
 
 
-
+                    if (verboseDeep)
+                    {
+                        Console.WriteLine("=====property " + i.Name + ", type " + t.Name);
+                    }
 
                     counter++;
                     i.Name = "P" + Helper.GetCode(counter, MethodBase.GetCurrentMethod());
+
+                    if (verboseDeep)
+                    {
+                        Console.WriteLine("    =====new value " + i.Name);
+                    }
+
+                    
                 }
 
                 counter = 0;
@@ -253,6 +304,7 @@ namespace BlazorSourceMangler
 
         private void RenameTypeNames()
         {
+            Stat.Reset();
             int counter = 0;
 
             IEnumerable<TypeDefinition> types;
@@ -263,13 +315,26 @@ namespace BlazorSourceMangler
             }
             else
             {
-                types = md.GetTypes().Where(x => !ShouldIgnoreClases.Any(y => y.Equals(x.Name.ToLower())) && !x.IsPublic && !x.IsRuntimeSpecialName && !x.Name.Contains("<") && !x.Name.Contains("."));
+                types = md.GetTypes().Where(x => !ShouldIgnoreClases.Any(y => y.Equals(x.Name.ToLower())) && x.IsNotPublic && !x.IsRuntimeSpecialName && !x.Name.Contains("<") && !x.Name.Contains("."));
             }
            
             foreach (var item in types)
             {
+
+                if (verboseDeep)
+                {
+                    Console.WriteLine("=====type " + item.Name);
+                }
+
                 counter++;
                 item.Name = "T" + Helper.GetCode(counter, MethodBase.GetCurrentMethod());
+
+                if (verboseDeep)
+                {
+                    Console.WriteLine("    =====new value " + item.Name);
+                }
+
+                
             }
 
             if (verbose)
@@ -278,8 +343,11 @@ namespace BlazorSourceMangler
             }
         }
 
+
         private void RenameEnumNames()
         {
+            Stat.Reset();
+
             int counter = 0;
 
             IEnumerable<TypeDefinition> enums;
@@ -290,7 +358,7 @@ namespace BlazorSourceMangler
             }
             else
             {
-                enums = md.GetTypes().Where(x => x.IsNotPublic && !x.IsRuntimeSpecialName && x.IsEnum);
+                enums = md.GetTypes().Where(x => !x.IsPublic && !x.IsNestedPublic && !x.IsRuntimeSpecialName && x.IsEnum);
             }
             
 
@@ -301,14 +369,26 @@ namespace BlazorSourceMangler
 
                 foreach (var i in fields)
                 {
-
+                 
                     if (i.Name == "value__")
                     {
                         continue;
                     }
 
+                    if (verboseDeep)
+                    {
+                        Console.WriteLine("=====enumField " + i.Name + ", enum " + e.Name);
+                    }
+
                     counter++;
                     i.Name = Helper.GetCode(counter, MethodBase.GetCurrentMethod());
+
+                    if (verboseDeep)
+                    {
+                        Console.WriteLine("    =====new value " + i.Name);
+                    }
+
+                    
                 }
 
                 counter = 0;
@@ -325,6 +405,7 @@ namespace BlazorSourceMangler
 
         private void RemoveDeadMethods()
         {
+            Stat.Reset();
             List<string> mustdelete = new List<string>();
 
             int counter = 0;
