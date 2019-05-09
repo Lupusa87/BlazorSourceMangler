@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-namespace BlazorSourceMangler
+namespace BlazorSourceMangler.Helpers
 {
-    internal static class Helper
+    internal static class CodeHelper
     {
 
         static int start = 'a' - 1;
