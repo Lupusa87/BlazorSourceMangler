@@ -1,10 +1,12 @@
 # Blazor Source Mangler
 
-This is .core console app which is processing blazor dlls (only blazor app and blazor lib dlls, not common dlls like mscorelib) and is mangling property/field/parameter/method/type/namespace names.
+App is not tested for latest commit and is in active development.
 
-Purpose is to make downloaded balzor dlls less readable for foreign eyes.
+This is .net core console app which is processing blazor dlls (only blazor app and blazor lib dlls, not common dlls like mscorlib) and is mangling property/field/parameter/method/type/namespace names and cleaning dead codes.
 
-Also shortening names is giving some small dll's size reducion.
+Purpose is to make downloaded blazor dlls smaller and less readable for foreign eyes.
+
+Also shortening names is giving some additional dll's size reducion.
 
 App is using mono.cecil.
 
@@ -12,5 +14,7 @@ App is using mono.cecil.
 Check this [youtube video](https://www.youtube.com/watch?v=nlXax81b1UE) for more details.
 
 Check this [blazor todos app](https://lupblazortodo.z20.web.core.windows.net) to see result of this app (downloaded blazortodos.dll is mangled and decompilation shows uglyfied code).
+
+Final goal is to use this tool for blazor common dlls too, to get more significant size reduction.
 
 Any PRs are welcome.
