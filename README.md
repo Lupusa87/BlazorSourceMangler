@@ -1,6 +1,6 @@
 # Blazor Source Mangler
 
-App is not tested for latest commit and is in active development.
+App is not tested (!!!) for latest commit and is in active development.
 
 This is .net core console app which is processing blazor dlls (only blazor app and blazor lib dlls, not common dlls like mscorlib) and is mangling property/field/parameter/method/type/namespace names and cleaning dead codes.
 
