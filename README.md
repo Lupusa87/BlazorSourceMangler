@@ -1,6 +1,17 @@
 # Blazor Source Mangler
 
-App is not tested (!!!) for latest commit and is in active development.
+![](https://placehold.it/15/4747d1/000000?text=+) 
+If you like my blazor works and want to see more open sourced repos please support me with [paypal donation](https://www.paypal.me/VakhtangiAbashidze/10)
+![](https://placehold.it/15/4747d1/000000?text=+) 
+
+![](https://placehold.it/15/00e600/000000?text=+) 
+Please send [email](mailto:VakhtangiAbashidze@gmail.com) if you consider to **hire me**.
+![](https://placehold.it/15/00e600/000000?text=+)     
+
+
+![](https://placehold.it/15/ffffff/000000?text=+)  
+
+**App is not tested (!!!) for latest commit and is not in active development.**
 
 This is .net core console app which is processing blazor dlls (only blazor app and blazor lib dlls, not common dlls like mscorlib) and is mangling property/field/parameter/method/type/namespace names and cleaning dead codes.
 
@@ -13,8 +24,5 @@ App is using mono.cecil.
 
 Check this [youtube video](https://www.youtube.com/watch?v=nlXax81b1UE) for more details.
 
-Check this [blazor todos app](https://lupblazortodo.z20.web.core.windows.net) to see result of this app (downloaded blazortodos.dll is mangled and decompilation shows uglyfied code).
-
-Final goal is to use this tool for blazor common dlls too, to get more significant size reduction.
 
 Any PRs are welcome.
